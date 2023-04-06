@@ -1,7 +1,9 @@
 import type {NextApiRequest, NextApiResponse} from 'next';
 import type {repostaPadraoMsg} from '../../../types/respostaPadrao';
 import type {CadastroRequisicao} from '../../../types/cadastroRequisicao';
-import {usuarioModel} from '../../../models/usuarioModels'
+import {usuarioModel} from '../../../models/usuarioModels';
+import md5 from 'md5';  
+import {conectarMongoDB} from '../../../middlewares/conectaMongoDB';
 
 const endpointCadastro = 
     async (req : NextApiRequest, res : NextApiResponse<repostaPadraoMsg>) => {
@@ -23,10 +25,15 @@ const endpointCadastro =
             return res.status(400).json({error : 'Senha invalida'});
         }
         //salvar banco de dados
-        await usuarioModel.create(usuario); 
+        const usuarioSalvamento = {
+            nome : usuario.nome,
+            email : usuario.email,
+            senha : md5(usuario.senha)
+        }
+        await usuarioModel.create(usuarioSalvamento); 
         return res.status(200).json({msg : 'Usuario cadastrado com sucesso'});
     }   
     return res.status(405).json({error : 'Metodo informado nao é valido'});
 }
 
-export default endpointCadastro;
+export default conectarMongoDB(endpointCadastro);
