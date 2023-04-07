@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, {Schema} from 'mongoose';
 
 const usuarioSchema = new Schema({
     nome: {type : String, required : true},
@@ -10,5 +10,11 @@ const usuarioSchema = new Schema({
     publicacoes : {type : Number, default : 0},
 });
 
-export const usuarioModel = (mongoose.models.usuario || 
-    mongoose.model('usuarios', usuarioSchema));
+
+let usuarioModel;
+try {
+  usuarioModel = mongoose.model('usuarios');
+} catch (error) {
+  usuarioModel = mongoose.model('usuarios', usuarioSchema);
+}
+export { usuarioModel };
