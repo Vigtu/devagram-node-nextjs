@@ -24,6 +24,14 @@ const endpointCadastro =
         if(!usuario.senha || usuario.senha.length < 4){
             return res.status(400).json({error : 'Senha invalida'});
         }
+
+        //validacao de usuario existente 
+        const usuariosMesmoEmail = await usuarioModel.find({email : usuario.email});
+        if(usuariosMesmoEmail && usuariosMesmoEmail.length > 0){
+            return res.status(400).json({error : 'Ja existe uma conta com esse email formado'});
+        }
+        
+
         //salvar banco de dados
         const usuarioSalvamento = {
             nome : usuario.nome,
