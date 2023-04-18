@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import type {repostaPadraoMsg} from '../../../types/respostaPadrao';
-import {validarTokenJwt} from '../../../middlewares/validarTokenJwt';
-import {conectarMongoDB} from '../../../middlewares/conectaMongoDB';
+import type { repostaPadraoMsg } from '../../../types/respostaPadrao';
+import { validarTokenJwt } from '../../../middlewares/validarTokenJwt';
+import { conectarMongoDB } from '../../../middlewares/conectaMongoDB';
 import { usuarioModel } from "../../../models/usuarioModels";
 import nc from 'next-connect';
-import {upload, uploadImagemCosmic} from '../../../services/uploadImagemCosmic';
+import { upload, uploadImagemCosmic } from '../../../services/uploadImagemCosmic';
 
 const handler = nc()
     .use(upload.single('file'))
@@ -18,9 +18,14 @@ const handler = nc()
             }
 
             const {nome} = req.body;
-            if(nome && nome.lenght < 2){
+
+            console.log("Nome antes da verificação:", nome);
+
+            if(nome && nome.length >= 2){
                 usuario.nome = nome;
             }
+
+            console.log("Nome após a verificação:", usuario.nome);
 
             const {file} = req;
             if(file && file.originalname){
@@ -32,8 +37,8 @@ const handler = nc()
             }
 
             // alterar os dados do DB
-            await usuarioModel
-                .findByIdAndUpdate({_id : usuario._id}, usuario);
+            await usuarioModel.findByIdAndUpdate(usuario._id, usuario, { new: true });
+          
 
             return res.status(200).json({msg : 'Usuario alterado com sucesso'});
 
@@ -59,10 +64,10 @@ const handler = nc()
     
     });
 
-    export const  config = {
-        api : {
-            bodyParser : false
-        }
+export const  config = {
+    api : {
+        bodyParser : false
     }
+}
 
 export default validarTokenJwt(conectarMongoDB(handler));
